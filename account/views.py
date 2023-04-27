@@ -5,8 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from account.serializers import RegisterSerializer
-
+from account.serializers import RegisterSerializer, ForgotPasswordSerializer, CreateNewPasswordSerializer
 
 User = get_user_model()
 
@@ -30,5 +29,22 @@ class ActivateUserApiView(APIView):
             user.save()
             return HttpResponse("Your account have been successfully activated!")
         except User.DoesnotExist:
-            return HttpResponse('Your activation code is not valid\n please check it again and try')
+            return HttpResponse('Your activation code is not valid please check it again and try')
 
+
+class ForgotPasswordApiView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.send_code()
+            return HttpResponse('An activation code has been sent to change your password!', status=status.HTTP_201_CREATED)
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateNewPasswordApiView(APIView):
+    def post(self, request):
+        serializer = CreateNewPasswordSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.change_password()
+            return  HttpResponse('Your password has been successfully changed!', status=status.HTTP_201_CREATED)
+        return HttpResponse(status=status.HTTP_400_BAD_REQUEST)

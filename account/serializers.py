@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from rest_framework import serializers
 
 from account.send_code import send_activation_code
@@ -27,3 +28,52 @@ class RegisterSerializer(serializers.ModelSerializer):
         send_activation_code(user.email, code)
         return user
 
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True) #Todo: required true is it
+
+    def validate_email(self, email):
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Account not found!')
+        return email
+
+    def send_code(self):
+        email = self.validated_data.get('email')
+        user = User.objects.get(email=email)
+        user.create_activation_code()
+        user.save()
+        send_mail(
+            "This is you new activation code to change your password. Please save it and do not lose ",
+            user.activation_code,
+            'bekbol.2019@gmail.com',
+            [email]
+        )
+
+
+class CreateNewPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True) #Todo: required true is it
+    password = serializers.CharField(required=True)
+    password2 = serializers.CharField(required=True, min_length=6)
+    activation_code = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+        password2 = attrs.pop('password2')
+        activation_code = attrs.get('activation_code')
+
+        if password != password2:
+            raise serializers.ValidationError('Password do not match')
+
+        if not User.objects.filter(activation_code=activation_code, email=email).exists():
+            raise serializers.ValidationError("Check your activation code or email!")
+
+        return attrs
+
+    def change_password(self):
+        email = self.validated_data.get('email')
+        password = self.validated_data.get('password')
+        user = User.objects.get(email=email)
+        user.set_password(password)
+        user.activation_code = ''
+        user.save()
