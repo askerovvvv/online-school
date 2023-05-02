@@ -71,3 +71,48 @@ class CourseTestApiTestCase(APITestCase):
         response = self.client.post(url, data, format='multipart')
         self.assertEqual(2, Course.objects.all().count())
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_valid_update(self):
+        url = reverse('course-detail', args=(self.course1.id,))
+        data = {
+            'id': 3,
+            'category': self.category.id,
+            'title': 'New title after update',
+            'description': 'After update',
+            'course_image': self.file
+        }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.put(url, data, format='multipart')
+        self.course1.refresh_from_db()
+        self.assertEqual(2, Course.objects.all().count())
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual('New title after update', self.course1.title)
+
+    def test_invalid_update(self):
+        url = reverse('course-detail', args=(self.course1.id,))
+        data = {
+            'id': 3,
+            'category': self.category.id,
+            'title': 'New title after update',
+            'description': 'After update',
+            'course_image': self.file
+        }
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.put(url, data, format='multipart')
+        self.course1.refresh_from_db()
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual('Python', self.course1.title)
+
+    def test_valid_delete(self):
+        url = reverse('course-detail', args=(self.course1.id,))
+        self.client.force_authenticate(user=self.user)
+        response = self.client.delete(url, format='multipart')
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(1, Course.objects.all().count())
+
+    def test_invalid_delete(self):
+        url = reverse('course-detail', args=(self.course1.id,))
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.delete(url, format='multipart')
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+        self.assertEqual(2, Course.objects.all().count())
