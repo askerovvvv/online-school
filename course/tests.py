@@ -24,7 +24,7 @@ class CourseTestApiTestCase(APITestCase):
         self.course1 = Course.objects.create(title='Python', category=self.category)
         self.course2 = Course.objects.create(title='Java', category=self.category)
 
-        self.serializer_data = CourseSerializers(Course.objects.all(), many=True).data
+        self.serializer_data = CourseSerializer(Course.objects.all(), many=True).data
 
         image = io.BytesIO()
         Image.new('RGB', (150, 150)).save(image, 'JPEG')
@@ -44,4 +44,30 @@ class CourseTestApiTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
+    def test_valid_post(self):
+        url = reverse('course-list')
+        data = {
+            'id': 3,
+            'category': self.category.id,
+            'title': 'Sprang',
+            'description': 'Teaching android developing',
+            'course_image': self.file
+        }
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(3, Course.objects.all().count())
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
+    def test_invalid_post(self):
+        url = reverse('course-list')
+        data = {
+            'id': 3,
+            'category': self.category.id,
+            'title': 'Sprang',
+            'description': 'Teaching android developing',
+            'course_image': self.file
+        }
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.post(url, data, format='multipart')
+        self.assertEqual(2, Course.objects.all().count())
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)

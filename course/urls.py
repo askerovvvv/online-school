@@ -7,5 +7,6 @@ router = DefaultRouter()
 router.register('', CourseModelViewSet)
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('saved-list/', SavedCourseList.as_view()),
+    path('', include(router.urls)),
 ]
