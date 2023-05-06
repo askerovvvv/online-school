@@ -46,6 +46,7 @@ class CourseTestApiTestCase(APITestCase):
 
     def test_valid_post(self):
         url = reverse('course-list')
+        print(url)
         data = {
             'id': 3,
             'category': self.category.id,
