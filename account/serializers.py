@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from account.mass_email import mass_email_send
-from account.models import MassEmail
+from account.models import MassEmails
 from account.send_code import send_activation_code
 
 User = get_user_model()
@@ -86,7 +86,7 @@ class MassEmailSerializer(serializers.ModelSerializer):
     # subject =  #todo: auto
 
     class Meta:
-        model = MassEmail
+        model = MassEmails
         fields = "__all__"
 
     def create(self, validated_data):
@@ -95,7 +95,7 @@ class MassEmailSerializer(serializers.ModelSerializer):
         subj = validated_data.get("subject")
         bod = validated_data.get("body")
 
-        mass_mail_data = MassEmail.objects.create(subject=subj, body=bod)
+        mass_mail_data = MassEmails.objects.create(subject=subj, body=bod)
         mass_mail_data.to.set(users)
         print(mass_mail_data.to)
         # users2 = User.objects.filter(Q(email__icontains=mass_mail_data.to))

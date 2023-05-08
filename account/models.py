@@ -53,7 +53,7 @@ class CustomUser(AbstractUser):
         self.activation_code = code
 
 
-class MassEmail(models.Model):
+class MassEmails(models.Model):
     subject = models.CharField(max_length=50)
     body = models.CharField(max_length=350)
-    to = models.ManyToManyField(CustomUser, related_name='mass_email')
+    to = models.ManyToManyField(CustomUser, related_name='mass_email') # Todo: create other logic to choose who will get a message

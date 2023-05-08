@@ -4,4 +4,4 @@ from account.models import *
 
 admin.site.register(CustomUser)
 
-admin.site.register(MassEmail)
+admin.site.register(MassEmails)
