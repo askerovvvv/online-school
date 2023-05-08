@@ -117,3 +117,5 @@ class CourseTestApiTestCase(APITestCase):
         response = self.client.delete(url, format='multipart')
         self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
         self.assertEqual(2, Course.objects.all().count())
+
+# class SavedTestApiTestCase(APITestCase):

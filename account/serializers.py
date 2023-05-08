@@ -1,14 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.db.models import Q
 from rest_framework import serializers
 
+from account.mass_email import mass_email_send
+from account.models import MassEmail
 from account.send_code import send_activation_code
 
 User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password2 = serializers.CharField(min_length=6, write_only=True, required=True) #Todo: write_only what is it
+    password2 = serializers.CharField(min_length=6, write_only=True, required=True)
 
     class Meta:
         model = User
@@ -30,7 +33,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True) #Todo: required true is it
+    email = serializers.EmailField(required=True)
 
     def validate_email(self, email):
         if not User.objects.filter(email=email).exists():
@@ -77,3 +80,25 @@ class CreateNewPasswordSerializer(serializers.Serializer):
         user.set_password(password)
         user.activation_code = ''
         user.save()
+
+
+class MassEmailSerializer(serializers.ModelSerializer):
+    # subject =  #todo: auto
+
+    class Meta:
+        model = MassEmail
+        fields = "__all__"
+
+    def create(self, validated_data):
+        print(validated_data.get("to"))
+        users = validated_data.get("to")
+        subj = validated_data.get("subject")
+        bod = validated_data.get("body")
+
+        mass_mail_data = MassEmail.objects.create(subject=subj, body=bod)
+        mass_mail_data.to.set(users)
+        print(mass_mail_data.to)
+        # users2 = User.objects.filter(Q(email__icontains=mass_mail_data.to))
+        # print(User.objects.all().email)
+        mass_email_send(subj, bod, User.objects.all())
+        return mass_mail_data

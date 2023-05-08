@@ -21,15 +21,15 @@ class TeacherInfoApiTestCase(APITestCase):
         self.file = SimpleUploadedFile('teacherimage.jpg', image.getvalue())
         self.user = User.objects.create(email='2@gmail.com')
 
+
     def test_valid_post(self):
         url = reverse('teacher')
         data = {
             'telephone_number': '0334532',
             'image': self.file,
-            'user': self.user.id,
             'name_of_lesson': 'Java'
         }
-
+        self.client.force_authenticate(user=self.user)
         response = self.client.post(url, data, format='multipart')
         self.assertEqual(1, TeacherInformation.objects.all().count())
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)

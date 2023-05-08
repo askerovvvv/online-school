@@ -45,9 +45,15 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = [] #TOdo: what is it
 
     def __str__(self):
-        return f"{self.email} --> {self.id}"
+        return f"{self.email}"
 
     def create_activation_code(self):
         import uuid
         code = str(uuid.uuid4())
         self.activation_code = code
+
+
+class MassEmail(models.Model):
+    subject = models.CharField(max_length=50)
+    body = models.CharField(max_length=350)
+    to = models.ManyToManyField(CustomUser, related_name='mass_email')

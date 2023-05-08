@@ -23,8 +23,7 @@ class TeacherInformation(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
-            old_self = TeacherInformation.objects.get(pk=self.pk)
+            old_self = TeacherInformation.objects.get(pk=self.pk) #Todo: logic if application wasn't approved
             if self.teacher != old_self.teacher:
                 is_teacher(self)
-                print('__________________')
         return super(TeacherInformation, self).save(*args, **kwargs)
