@@ -21,15 +21,15 @@ class TeacherInformation(models.Model):
     image = models.ImageField(upload_to='teacherimage/')
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
     name_of_lesson = models.CharField(max_length=50)
-    teacher = models.BooleanField()
+    # teacher = models.BooleanField()
 
     def __str__(self):
         return f"{self.user} teaches {self.name_of_lesson}"
     # experince
 
-    def save(self, *args, **kwargs):
-        if self.pk is not None:
-            old_self = TeacherInformation.objects.get(pk=self.pk) #Todo: logic if application wasn't approved
-            if self.teacher != old_self.teacher:
-                is_teacher(self)
-        return super(TeacherInformation, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.pk is not None:
+    #         old_self = TeacherInformation.objects.get(pk=self.pk) #Todo: logic if application wasn't approved
+    #         if self.teacher != old_self.teacher:
+    #             is_teacher(self)
+    #     return super(TeacherInformation, self).save(*args, **kwargs)
