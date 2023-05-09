@@ -90,15 +90,12 @@ class MassEmailSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        print(validated_data.get("to"))
-        users = validated_data.get("to")
-        subj = validated_data.get("subject")
-        bod = validated_data.get("body")
+        subject = validated_data.get("subject")
+        body = validated_data.get("current_body")
 
-        mass_mail_data = MassEmails.objects.create(subject=subj, body=bod)
-        mass_mail_data.to.set(users)
-        print(mass_mail_data.to)
+        mass_mail_data = MassEmails.objects.create(subject=subject, current_body=body)
+        # print(mass_mail_data.to)
         # users2 = User.objects.filter(Q(email__icontains=mass_mail_data.to))
         # print(User.objects.all().email)
-        mass_email_send(subj, bod, User.objects.all())
+        mass_email_send(subject, body, User.objects.all())
         return mass_mail_data

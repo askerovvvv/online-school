@@ -55,5 +55,5 @@ class CustomUser(AbstractUser):
 
 class MassEmails(models.Model):
     subject = models.CharField(max_length=50)
-    body = models.CharField(max_length=350)
-    to = models.ManyToManyField(CustomUser, related_name='mass_email') # Todo: create other logic to choose who will get a message
+    current_body = models.CharField(max_length=350)
+    # to = models.ManyToManyField(CustomUser, related_name='mass_email') # Todo: create other logic to choose who will get a message

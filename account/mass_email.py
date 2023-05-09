@@ -5,7 +5,8 @@ def mass_email_send(subject, body, to):
     email = EmailMessage(
         subject=subject,
         body=body,
-        to=to
+        to=to   # []for i in users ...
     )
+
     email.send()
 

@@ -7,10 +7,16 @@ from teacher.signals import is_teacher
 
 User = get_user_model()
 
-t = django.dispatch.Signal()
+
+STATUS_CHOICES = [
+    ('a', 'approved'),
+    ('u', 'under consideration'),
+    ('d', 'deleted')
+]
 
 
 class TeacherInformation(models.Model):
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='u')
     telephone_number = models.CharField(max_length=25)
     image = models.ImageField(upload_to='teacherimage/')
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
